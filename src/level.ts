@@ -1,32 +1,15 @@
 /**
- * Standard log levels
+ * Standard log levels as string literal union and value object.
  */
-export enum LogLevel {
-  /**
-   * Debug messages - detailed info for debugging
-   */
-  DEBUG = 'debug',
-  
-  /**
-   * Informational messages - application progress
-   */
-  INFO = 'info',
-  
-  /**
-   * Warning messages - potential issues
-   */
-  WARN = 'warn',
-  
-  /**
-   * Error messages - issues that should be addressed
-   */
-  ERROR = 'error',
-  
-  /**
-   * No logging output
-   */
-  SILENT = 'silent'
-}
+export const LogLevel = {
+  DEBUG: "debug",
+  INFO: "info",
+  WARN: "warn",
+  ERROR: "error",
+  SILENT: "silent",
+} as const;
+
+export type LogLevel = (typeof LogLevel)[keyof typeof LogLevel];
 
 /**
  * Maps log levels to numeric values for comparison
@@ -37,12 +20,15 @@ export const LOG_LEVEL_VALUES: Record<LogLevel, number> = {
   [LogLevel.INFO]: 1,
   [LogLevel.WARN]: 2,
   [LogLevel.ERROR]: 3,
-  [LogLevel.SILENT]: 4
+  [LogLevel.SILENT]: 4,
 };
 
 /**
  * Check if a given level should be logged at the current minimum level
  */
-export function shouldLog(currentLevel: LogLevel, minimumLevel: LogLevel): boolean {
+export function shouldLog(
+  currentLevel: LogLevel,
+  minimumLevel: LogLevel,
+): boolean {
   return LOG_LEVEL_VALUES[currentLevel] >= LOG_LEVEL_VALUES[minimumLevel];
 }

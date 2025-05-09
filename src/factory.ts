@@ -1,14 +1,14 @@
-import { Logger, LoggerOptions } from './logger.interface';
-import { ConsoleLogger } from './adapters/console-logger';
-import { NullLogger } from './adapters/null-logger';
-import { LogLevel } from './level';
+import type { Logger, LoggerOptions } from "./logger.interface";
+import { ConsoleLogger } from "./adapters/console-logger";
+import { NullLogger } from "./adapters/null-logger";
+import { LogLevel } from "./level";
 
 /**
  * Available logger types
  */
 export enum LoggerType {
-  CONSOLE = 'console',
-  NULL = 'null'
+  CONSOLE = "console",
+  NULL = "null",
 }
 
 /**
@@ -19,7 +19,7 @@ export enum LoggerType {
  */
 export function createLogger(
   type: LoggerType = LoggerType.CONSOLE,
-  options: LoggerOptions = {}
+  options: LoggerOptions = {},
 ): Logger {
   switch (type) {
     case LoggerType.CONSOLE:
@@ -37,7 +37,7 @@ export function createLogger(
  */
 export const rootLogger = createLogger(LoggerType.CONSOLE, {
   level: (process.env.LOG_LEVEL as LogLevel) || LogLevel.INFO,
-  context: 'Synet'
+  context: "Synet",
 });
 
 /**
