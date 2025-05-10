@@ -1,6 +1,6 @@
 {
   "name": "@synet/logger",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Logging abstraction for Synet packages",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -14,12 +14,12 @@
   "scripts": {
     "build": "tsc",
     "clean": "rimraf dist",
-    "test": "vitest",
+    "test": "vitest run",
     "lint": "biome lint ./src",
     "dev:test": "vitest --watch",
     "format": "prettier --write 'src/**/*.ts'",
     "coverage": "vitest run --coverage",
-     "prepublishOnly": "npm run lint && npm run build && npm test"
+    "prepublishOnly": "npm run lint && npm run build && npm test"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
