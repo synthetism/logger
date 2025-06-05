@@ -35,35 +35,51 @@ export function createLogger(
 }
 
 /**
- * Default root logger instance - reuse this when possible
+ * Singleton instances for reuse
  */
-export const rootLogger = createLogger(LoggerType.CONSOLE, {
-  level: (process.env.LOG_LEVEL as LogLevel) || LogLevel.INFO,
-  context: "Synet",
-});
+const loggerInstances = {
+  root: createLogger(LoggerType.CONSOLE, {
+    level: (process.env.LOG_LEVEL as LogLevel) || LogLevel.INFO,
+    context: "Synet",
+  }),
+  null: new NullLogger(),
+};
 
 /**
- * Default root logger instance - reuse this when possible
+ * Get a logger with the specified context
+ * 
+ * @param context The context for the logger (e.g. "KeyService", "Network")
+ * @param type Optional logger type, defaults to the one specified in environment
+ * @returns A logger with the specified context
  */
-export const nullLogger = createLogger(LoggerType.NULL, {
-  level: LogLevel.SILENT,
-  context: "Synet",
-});
-
-/**
- * Get a child logger from the root logger
- * @param context The context for the child logger
- * @returns A child logger
- */
-export function getLogger(context: string): Logger {
-  return rootLogger.child(context);
+export function getLogger(
+  context: string, 
+  type?: LoggerType
+): Logger {
+  // If type is explicitly specified, create a new logger of that type
+  if (type !== undefined) {
+    return createLogger(type, { context });
+  }
+  
+  // Use NULL logger if LOG_SILENT env var is truthy
+  if (process.env.LOG_SILENT === "true" || process.env.LOG_SILENT === "1") {
+    return loggerInstances.null;
+  }
+  
+  // Otherwise use the root logger with the provided context
+  return loggerInstances.root.child(context);
 }
 
 /**
- * Get a child logger from the null logger
- * @param context The context for the child logger
- * @returns A child logger
+ * Get a logger that discards all messages
+ * @param context Optional context for the null logger
+ * @returns A null logger that discards all messages
  */
-export function getNull(context: string): Logger {
-  return nullLogger.child(context);
+export function getNullLogger(context?: string): Logger {
+  return context ? loggerInstances.null.child(context) : loggerInstances.null;
 }
+
+/**
+ * Convenience export for the null logger singleton
+ */
+export const nullLogger = loggerInstances.null;
