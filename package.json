@@ -1,6 +1,6 @@
 {
   "name": "@synet/logger",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Logging abstraction for Synet packages",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
