@@ -5,6 +5,8 @@ import { LogLevel } from "./level";
 
 /**
  * Available logger types
+ * CONSOLE: Logs to the console
+ * NULL: Discards all log messages (no output)
  */
 export enum LoggerType {
   CONSOLE = "console",
@@ -41,10 +43,27 @@ export const rootLogger = createLogger(LoggerType.CONSOLE, {
 });
 
 /**
+ * Default root logger instance - reuse this when possible
+ */
+export const nullLogger = createLogger(LoggerType.NULL, {
+  level: LogLevel.SILENT,
+  context: "Synet",
+});
+
+/**
  * Get a child logger from the root logger
  * @param context The context for the child logger
  * @returns A child logger
  */
 export function getLogger(context: string): Logger {
   return rootLogger.child(context);
+}
+
+/**
+ * Get a child logger from the null logger
+ * @param context The context for the child logger
+ * @returns A child logger
+ */
+export function getNull(context: string): Logger {
+  return nullLogger.child(context);
 }
