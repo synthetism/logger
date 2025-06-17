@@ -9,7 +9,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/synthetism/synet/packages/synet-logger.git"
+    "url": "git+https://github.com/synthetism/synet-logger.git"
   },
   "scripts": {
     "build": "tsc",
@@ -19,7 +19,12 @@
     "dev:test": "vitest --watch",
     "format": "prettier --write 'src/**/*.ts'",
     "coverage": "vitest run --coverage",
-    "prepublishOnly": "npm run lint && npm run build && npm test"
+    "prepublishOnly": "npm run lint && npm run build && npm test",
+    "version:patch": "npm version --no-git-tag-version patch",
+    "version:minor": "npm version --no-git-tag-version minor",
+    "version:major": "npm version --no-git-tag-version major",
+    "publish:dev": "npm publish --registry=http://registry.dig.run/ --tag dev",
+    "publish:prod": "npm publish --registry=https://registry.npmjs.org/"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
