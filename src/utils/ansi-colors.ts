@@ -37,11 +37,10 @@ const ANSI_COLOR_REGEX = /\x1B\[\d+(;\d+)*m/g;
  * @param str String to check
  */
 export function hasAnsiColorCodes(str: string): boolean {
-  
-  console.log('Checking for ANSI color codes in:', str);
-  
+  console.log("Checking for ANSI color codes in:", str);
+
   // Ensure the input is a string
-  if (typeof str !== 'string') {
+  if (typeof str !== "string") {
     return false;
   }
   // Reset the regex before testing
@@ -54,10 +53,9 @@ export function hasAnsiColorCodes(str: string): boolean {
  * @param str String to strip colors from
  */
 export function stripAnsiColorCodes(str: string): string {
- 
-  if (typeof str !== 'string') {
+  if (typeof str !== "string") {
     return str;
   }
 
-  return str.replace(ANSI_COLOR_REGEX, '');
+  return str.replace(ANSI_COLOR_REGEX, "");
 }

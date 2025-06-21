@@ -1,6 +1,7 @@
 // Core exports
-export * from "./logger.interface";
-export * from "./level";
+export * from "./types/logger.interface";
+export * from "./types/event-channel.interface";
+export * from "./types/level";
 
 // Adapter implementations
 export * from "./adapters";

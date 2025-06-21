@@ -1,5 +1,5 @@
-import type { Logger } from "../logger.interface";
-import type { LogLevel } from "../level";
+import type { Logger } from "../types/logger.interface";
+import type { LogLevel } from "../types/level";
 
 /**
  * A no-op logger implementation that does nothing

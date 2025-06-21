@@ -1,5 +1,5 @@
 import type { LogLevel } from "./level";
-
+import type { EventChannel } from "./event-channel.interface";
 /**
  * Core logger interface shared across Synet packages
  */
@@ -86,4 +86,16 @@ export interface LoggerOptions {
      */
     dateFormat?: "ISO" | "locale" | "epoch";
   };
+
+  /**
+   * Optional event channel for EventLogger
+   * Required if using EventLogger
+   */
+  eventChannel?: EventChannel;
+
+  /**
+   * Array of loggers for MultiLogger
+   * Required if using MultiLogger
+   */
+  loggers?: Logger[];
 }

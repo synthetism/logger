@@ -2,7 +2,7 @@
 
 // Factory functions
 import {ConsoleLogger} from "../src/adapters/console-logger";
-import { LogLevel } from "../src/level";
+import { LogLevel } from "../src/types/level";
 
 async function stripped() {
 
