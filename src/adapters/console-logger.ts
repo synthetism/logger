@@ -102,6 +102,35 @@ export class ConsoleLogger implements Logger {
     return result;
   }
 
+  private stripColorsFromObj(obj: unknown): unknown {
+    if (obj === null || obj === undefined) {
+      return obj;
+    }
+    
+    // Handle strings
+    if (typeof obj === 'string') {
+      return stripAnsiColorCodes(obj);
+    }
+    
+    // Handle arrays
+    if (Array.isArray(obj)) {
+      return obj.map(item => this.stripColorsFromObj(item));
+    }
+    
+    // Skip if not an object or is an Error
+    if (typeof obj !== 'object' || obj instanceof Error) {
+      return obj;
+    }
+    
+    // Handle plain objects
+    const result: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(obj)) {
+      result[key] = this.stripColorsFromObj(value);
+    }
+    
+    return result;
+  }
+
   /**
    * Format and write a log message
    */
@@ -145,9 +174,15 @@ export class ConsoleLogger implements Logger {
       );
     }
 
-    const strippedArgs = processedArgs.map((arg) =>
-      this.stripColorsFromArgs(arg),
-    );
+    const strippedArgs =processedArgs.map(arg => {
+          if (typeof arg === 'string') {
+            return stripAnsiColorCodes(arg);
+          }
+          if (typeof arg === 'object' && arg !== null) {
+            return this.stripColorsFromObj(arg);
+          }
+          return arg;
+    });
 
     type ConsoleMethods = "debug" | "info" | "warn" | "error" | "log";
     const methodMap: Record<LogLevel, ConsoleMethods> = {

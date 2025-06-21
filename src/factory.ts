@@ -8,6 +8,7 @@ import type { Logger, LoggerOptions } from "./types/logger.interface";
 import type { EventChannel } from "./types/event-channel.interface";
 import type { EventLoggerOptions } from "./adapters/event-logger";
 import { LogLevel } from "./types/level";
+import type { LoggerEvent } from "./types/logger-events";
 /**
  * Available logger types
  * CONSOLE: Logs to the console
@@ -37,14 +38,6 @@ export function createLogger(
       return new ConsoleLogger(options);
     case LoggerType.NULL:
       return new NullLogger();
-    case LoggerType.EVENT:
-      if (!options.eventChannel) {
-        throw new Error("EventChannel is required for EventLogger");
-      }
-      return new EventLogger(
-        options.eventChannel as EventChannel,
-        options as EventLoggerOptions,
-      );
     case LoggerType.MULTI:
       if (!options.loggers || !Array.isArray(options.loggers)) {
         throw new Error("Loggers array is required for MultiLogger");
@@ -59,8 +52,8 @@ export function createLogger(
 /**
  * Creates an EventLogger that sends logs to an EventChannel
  */
-export function createEventLogger(
-  eventChannel: EventChannel,
+export function createEventLogger<T>(
+  eventChannel: EventChannel<LoggerEvent>,
   options: EventLoggerOptions = {},
 ): Logger {
   return new EventLogger(eventChannel, options);

@@ -3,7 +3,7 @@ import type { RealtimeEvent } from "./realtime-event";
  * Core interface for EventChannel implementations
  */
 
-export interface EventChannel<TEvent extends RealtimeEvent = RealtimeEvent> {
+export interface EventChannel<TEvent> {
   /**
    * Connect to the event broker
    */

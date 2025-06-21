@@ -88,12 +88,6 @@ export interface LoggerOptions {
   };
 
   /**
-   * Optional event channel for EventLogger
-   * Required if using EventLogger
-   */
-  eventChannel?: EventChannel;
-
-  /**
    * Array of loggers for MultiLogger
    * Required if using MultiLogger
    */

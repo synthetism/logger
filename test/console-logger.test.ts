@@ -1,10 +1,13 @@
 import { ConsoleLogger } from '../src/adapters/console-logger';
-import { LogLevel } from '../src/level';
+import { LogLevel } from '../src/types/level';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 describe('ConsoleLogger', () => {
   // Spy on console methods
-  const consoleMethods = {
+  type ConsoleMethods = 'debug' | 'info' | 'warn' | 'error' | 'log';
+  
+  
+ const consoleMethods: Record<ConsoleMethods, ReturnType<typeof vi.spyOn>> = {
     debug: vi.spyOn(console, 'debug').mockImplementation(() => {}),
     info: vi.spyOn(console, 'info').mockImplementation(() => {}),
     warn: vi.spyOn(console, 'warn').mockImplementation(() => {}),
@@ -106,20 +109,25 @@ describe('ConsoleLogger', () => {
     );
   });
 
-  it('should handle multiple arguments after template context', () => {
+ it('should handle multiple arguments after template context', () => {
     const logger = new ConsoleLogger({
       timestamp: false,
     });
 
+    // Create an actual Error object (not just a mock)
     const error = new Error('Something went wrong');
-    logger.error('Failed to process {item}', { item: 'payment' }, error, { additionalInfo: 'retry later' });
+    // Pass the actual error object as the argument
+    const additionalInfo = { additionalInfo: 'retry later' };
+    
+    logger.error('Failed to process {item}', { item: 'payment' }, error, additionalInfo);
 
+    // Verify the error was called with the correct arguments
     expect(consoleMethods.error).toHaveBeenCalledWith(
       expect.any(String),
       'Failed to process payment',
       { item: 'payment' },
-      error,
-      { additionalInfo: 'retry later' }
+      error, // This should be the actual Error object
+      additionalInfo
     );
   });
 

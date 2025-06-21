@@ -3,7 +3,7 @@ import { LogLevel, shouldLog } from "../types/level";
 import { formatMessage } from "../utils/format-message";
 import { stripAnsiColorCodes } from "../utils/ansi-colors";
 import type { EventChannel } from "../types/event-channel.interface";
-import type { RealtimeEvent } from "../types/realtime-event";
+import type { LoggerEventType,LoggerEvent } from "../types/logger-events";
 
 export interface EventLoggerOptions extends LoggerOptions {
   /** The channel name to publish logs to */
@@ -16,11 +16,11 @@ export interface EventLoggerOptions extends LoggerOptions {
  */
 export class EventLogger implements Logger {
   private readonly options: Required<
-    Omit<EventLoggerOptions, "eventChannel" | "loggers">
+    Omit<EventLoggerOptions, "loggers">
   >;
 
   constructor(
-    private readonly eventChannel: EventChannel,
+    private readonly eventChannel: EventChannel<LoggerEvent>,
     options: EventLoggerOptions = {},
   ) {
     this.options = {
@@ -65,17 +65,17 @@ export class EventLogger implements Logger {
 
     try {
       // Create the log event
-      const logEvent: RealtimeEvent = {
-        id: crypto.randomUUID(),
-        type: this.options.channelName,
+      const logEvent = {
+        id: 'test',
+        type: `logger.${level}`,
         source: this.options.context,
         timestamp: new Date(),
         data: {
-          level,
+          level: `logger.${level}`,
           message: formattedMessage,
           args: strippedArgs,
         },
-      };
+      } as LoggerEvent;
 
       // Send to the event channel
       await this.eventChannel.publish(logEvent);
