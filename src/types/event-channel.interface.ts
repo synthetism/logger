@@ -1,38 +1,11 @@
-import type { RealtimeEvent } from "./realtime-event";
 /**
- * Core interface for EventChannel implementations
+ * Generic interface for a channel that can publish events
  */
-
-export interface EventChannel<TEvent> {
+export interface EventChannel<TEvent = unknown> {
   /**
-   * Connect to the event broker
-   */
-  connect(): Promise<void>;
-
-  /**
-   * Subscribe to events
-   * @param type Event type to listen for, or "*" for all events
-   * @param handler Function to call when matching events are received
-   * @returns Function to call to unsubscribe
-   */
-  on<T extends TEvent = TEvent>(
-    type: string,
-    handler: (event: T) => void,
-  ): () => void;
-
-  /**
-   * Publish an event
-   * @param event The event to publish
+   * Publishes an event to the specified channel
+   * @param channel The channel to publish to
+   * @param event The event data to publish
    */
   publish(event: TEvent): Promise<void>;
-
-  /**
-   * Close the connection and clean up resources
-   */
-  close(): Promise<void>;
-
-  /**
-   * Get the unique ID of this channel instance
-   */
-  getId(): string;
 }
