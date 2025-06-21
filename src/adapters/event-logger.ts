@@ -71,7 +71,7 @@ export class EventLogger implements Logger {
         source: this.options.context,
         timestamp: new Date(),
         data: {
-          level: `logger.${level}`,
+          level: level,
           message: formattedMessage,
           args: strippedArgs,
         },
