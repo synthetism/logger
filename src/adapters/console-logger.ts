@@ -1,7 +1,7 @@
 import type { Logger, LoggerOptions } from "../logger.interface";
-
 import { LogLevel, shouldLog } from "../level";
-
+import { formatMessage } from "../utils/format-message";
+import { stripAnsiColorCodes } from "../utils/ansi-colors";
 /**
  * A console-based implementation of the Logger interface
  */
@@ -71,6 +71,35 @@ export class ConsoleLogger implements Logger {
     return color ? `${color}${text}${colors.reset}` : text;
   }
 
+/**
+ * Strip colors from an object or value after the log message is formatted
+ */
+private stripColorsFromArgs(value: unknown): unknown {
+  if (value === null || value === undefined) {
+    return value;
+  }
+
+     console.log('Stripping ANSI color codes from:', value);
+  
+  if (typeof value === 'string') {
+    return stripAnsiColorCodes(value);
+  }
+  
+  if (typeof value !== 'object') {
+    return value;
+  }
+  
+  if (Array.isArray(value)) {
+    return value.map(item => this.stripColorsFromArgs(item));
+  }
+  
+  const result: Record<string, unknown> = {};
+  for (const [key, val] of Object.entries(value)) {
+    result[key] = this.stripColorsFromArgs(val);
+  }
+  return result;
+}
+
   /**
    * Format and write a log message
    */
@@ -97,23 +126,32 @@ export class ConsoleLogger implements Logger {
     const logPrefix = parts.join(" ");
     const formattedPrefix = this.colorize(logPrefix, level);
 
-    // Use appropriate console method for the level
-    switch (level) {
-      case LogLevel.DEBUG:
-        console.debug(formattedPrefix, message, ...args);
-        break;
-      case LogLevel.INFO:
-        console.info(formattedPrefix, message, ...args);
-        break;
-      case LogLevel.WARN:
-        console.warn(formattedPrefix, message, ...args);
-        break;
-      case LogLevel.ERROR:
-        console.error(formattedPrefix, message, ...args);
-        break;
-      default:
-        console.log(formattedPrefix, message, ...args);
+    // Process template placeholders if first arg is an object
+    let formattedMessage = message;
+    const processedArgs = [...args];
+    
+    if (args.length > 0 && 
+        typeof args[0] === 'object' && 
+        args[0] !== null && 
+        !(args[0] instanceof Error)) {
+      // Use the first argument as context for template processing
+      formattedMessage = formatMessage(message, args[0] as Record<string, unknown>);
     }
+
+    const strippedArgs = processedArgs.map(arg => this.stripColorsFromArgs(arg));
+
+    type ConsoleMethods = 'debug' | 'info' | 'warn' | 'error' | 'log';
+    const methodMap: Record<LogLevel, ConsoleMethods> = {
+      debug: 'debug',
+      info: 'info',
+      warn: 'warn',
+      error: 'error',
+      silent: 'log',
+    };
+    
+    const consoleMethod = methodMap[level] || 'log';
+    console[consoleMethod](formattedPrefix, formattedMessage, ...strippedArgs);
+  
   }
 
   debug(message: string, ...args: unknown[]): void {
