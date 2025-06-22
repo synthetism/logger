@@ -7,7 +7,7 @@
 	},
 	"files": {
 		"ignoreUnknown": false,
-		"ignore": ["utils/ansi-colors.ts"]
+		"ignore": ["utils/strip-colors.ts"]
 	},
 	"formatter": {
 		"enabled": true,
