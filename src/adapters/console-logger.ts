@@ -1,7 +1,10 @@
 import type { Logger, LoggerOptions } from "../types/logger.interface";
 import { LogLevel, shouldLog } from "../types/level";
 import { formatMessage } from "../utils/format-message";
-import { stripAnsiColorCodes } from "../utils/ansi-colors";
+import {
+  stripAnsiColorCodes,
+  stripColorsFromArgs,
+} from "../utils/strip-colors";
 /**
  * A console-based implementation of the Logger interface
  */
@@ -73,61 +76,32 @@ export class ConsoleLogger implements Logger {
     return color ? `${color}${text}${colors.reset}` : text;
   }
 
-  /**
-   * Strip colors from an object or value after the log message is formatted
-   */
-  private stripColorsFromArgs(value: unknown): unknown {
-    if (value === null || value === undefined) {
-      return value;
-    }
-
-    console.log("Stripping ANSI color codes from:", value);
-
-    if (typeof value === "string") {
-      return stripAnsiColorCodes(value);
-    }
-
-    if (typeof value !== "object") {
-      return value;
-    }
-
-    if (Array.isArray(value)) {
-      return value.map((item) => this.stripColorsFromArgs(item));
-    }
-
-    const result: Record<string, unknown> = {};
-    for (const [key, val] of Object.entries(value)) {
-      result[key] = this.stripColorsFromArgs(val);
-    }
-    return result;
-  }
-
-  private stripColorsFromObj(obj: unknown): unknown {
+  private stripColorsFromObj1(obj: unknown): unknown {
     if (obj === null || obj === undefined) {
       return obj;
     }
-    
+
     // Handle strings
-    if (typeof obj === 'string') {
+    if (typeof obj === "string") {
       return stripAnsiColorCodes(obj);
     }
-    
+
     // Handle arrays
     if (Array.isArray(obj)) {
-      return obj.map(item => this.stripColorsFromObj(item));
+      return obj.map((item) => this.stripColorsFromObj1(item));
     }
-    
+
     // Skip if not an object or is an Error
-    if (typeof obj !== 'object' || obj instanceof Error) {
+    if (typeof obj !== "object" || obj instanceof Error) {
       return obj;
     }
-    
+
     // Handle plain objects
     const result: Record<string, unknown> = {};
     for (const [key, value] of Object.entries(obj)) {
-      result[key] = this.stripColorsFromObj(value);
+      result[key] = this.stripColorsFromObj1(value);
     }
-    
+
     return result;
   }
 
@@ -174,15 +148,7 @@ export class ConsoleLogger implements Logger {
       );
     }
 
-    const strippedArgs =processedArgs.map(arg => {
-          if (typeof arg === 'string') {
-            return stripAnsiColorCodes(arg);
-          }
-          if (typeof arg === 'object' && arg !== null) {
-            return this.stripColorsFromObj(arg);
-          }
-          return arg;
-    });
+    const strippedArgs = stripColorsFromArgs(processedArgs);
 
     type ConsoleMethods = "debug" | "info" | "warn" | "error" | "log";
     const methodMap: Record<LogLevel, ConsoleMethods> = {

@@ -1,13 +1,14 @@
 import type { Logger, LoggerOptions } from "../types/logger.interface";
 import { LogLevel, shouldLog } from "../types/level";
 import { formatMessage } from "../utils/format-message";
-import { stripAnsiColorCodes } from "../utils/ansi-colors";
 import type { EventChannel } from "../types/event-channel.interface";
-import type { LoggerEventType,LoggerEvent } from "../types/logger-events";
-
+import type { LoggerEvent } from "../types/logger-events";
+import {
+  stripColorsFromArgs,
+  stripAnsiColorCodes,
+} from "../utils/strip-colors";
 export interface EventLoggerOptions extends LoggerOptions {
   /** The channel name to publish logs to */
-  channelName?: string;
 }
 
 /**
@@ -15,9 +16,7 @@ export interface EventLoggerOptions extends LoggerOptions {
  * This can be used to send logs to remote systems
  */
 export class EventLogger implements Logger {
-  private readonly options: Required<
-    Omit<EventLoggerOptions, "loggers">
-  >;
+  private readonly options: Required<Omit<EventLoggerOptions, "loggers">>;
 
   constructor(
     private readonly eventChannel: EventChannel<LoggerEvent>,
@@ -25,13 +24,12 @@ export class EventLogger implements Logger {
   ) {
     this.options = {
       level: options.level || LogLevel.INFO,
-      context: options.context || "Synet",
+      context: options.context || "Logger",
       timestamp: options.timestamp !== undefined ? options.timestamp : true,
       formatting: {
         colorize: false, // Colors don't make sense for remote logging
         dateFormat: options.formatting?.dateFormat || "ISO",
       },
-      channelName: options.channelName || "logs",
     };
   }
 
@@ -60,13 +58,12 @@ export class EventLogger implements Logger {
       );
     }
 
-    // Always strip colors for remote logging
-    const strippedArgs = processedArgs.map((arg) => this.stripColorsDeep(arg));
+    const strippedArgs = stripColorsFromArgs(processedArgs);
 
     try {
       // Create the log event
       const logEvent = {
-        id: 'test',
+        id: crypto.randomUUID(),
         type: `logger.${level}`,
         source: this.options.context,
         timestamp: new Date(),

@@ -3,7 +3,10 @@ import * as path from "node:path";
 import type { Logger, LoggerOptions } from "../types/logger.interface";
 import { LogLevel, shouldLog } from "../types/level";
 import { formatMessage } from "../utils/format-message";
-import { stripAnsiColorCodes } from "../utils/ansi-colors";
+import {
+  stripColorsFromArgs,
+  stripAnsiColorCodes,
+} from "../utils/strip-colors";
 
 export interface FileLoggerOptions extends LoggerOptions {
   /**
@@ -174,15 +177,10 @@ export class FileLogger implements Logger {
     const logPrefix = parts.join(" ");
     let logEntry = `${logPrefix} ${formattedMessage}`;
 
+    const strippedArgs = stripColorsFromArgs(processedArgs);
+
     // Add remaining args as JSON
     if (processedArgs.length > 0) {
-      const strippedArgs = processedArgs.map((arg) => {
-        if (typeof arg === "string") {
-          return stripAnsiColorCodes(arg);
-        }
-        return arg;
-      });
-
       try {
         logEntry += `  ${JSON.stringify(strippedArgs)};`;
       } catch {

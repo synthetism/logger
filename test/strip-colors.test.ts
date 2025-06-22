@@ -1,4 +1,4 @@
-import { hasAnsiColorCodes, stripAnsiColorCodes, Colors } from '../src/utils/ansi-colors';
+import { hasAnsiColorCodes, stripAnsiColorCodes} from '../src/utils/strip-colors';
 import { describe, it, expect } from 'vitest';
 
 describe('ANSI color utilities', () => {
