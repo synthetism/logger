@@ -1,6 +1,6 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
-import type { Logger, LoggerOptions } from "../types/logger.interface";
+import type { ILogger, LoggerOptions } from "../types/logger.interface";
 import { LogLevel, shouldLog } from "../types/level";
 import { formatMessage } from "../utils/format-message";
 import {
@@ -37,7 +37,7 @@ export interface FileLoggerOptions extends LoggerOptions {
 /**
  * A logger implementation that writes to a file
  */
-export class FileLogger implements Logger {
+export class FileLogger implements ILogger {
   private readonly options: Required<
     Omit<FileLoggerOptions, "eventChannel" | "loggers" | "channelName">
   >;
@@ -230,7 +230,7 @@ export class FileLogger implements Logger {
   /**
    * Create a child logger with a new context
    */
-  child(context: string): Logger {
+  child(context: string): ILogger {
     return new FileLogger({
       ...this.options,
       context: `${this.options.context}:${context}`,

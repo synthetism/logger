@@ -1,7 +1,7 @@
 {
   "name": "@synet/logger",
-  "version": "0.1.4-dev.9",
-  "description": "Logging abstraction for Synet packages",
+  "version": "1.0.1-dev.1",
+  "description": "Dependency-free, multi-adapter logging with Unit Architecture compliance",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
@@ -16,6 +16,7 @@
     "clean": "rimraf dist",
     "test": "vitest run",
     "lint": "biome lint ./src",
+    "lint:fix": "biome lint --write ./src",
     "dev:test": "vitest --watch",
     "format": "prettier --write 'src/**/*.ts'",
     "coverage": "vitest run --coverage",
@@ -26,6 +27,9 @@
     "version:major": "npm version --no-git-tag-version major",
     "publish:dev": "npm publish --registry=http://registry.dig.run/ --tag dev",
     "publish:prod": "npm publish --registry=https://registry.npmjs.org/"
+  },
+  "dependencies": {
+    "@synet/unit": "^1.0.6"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
@@ -41,6 +45,6 @@
     "registry": "https://registry.npmjs.org/"
   },
   "author": "Synet Team",
-  "homepage": "https://synthetism.ai/synet",
+  "homepage": "https://synthetism.ai",
   "license": "MIT"
 }

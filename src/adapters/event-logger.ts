@@ -1,4 +1,4 @@
-import type { Logger, LoggerOptions } from "../types/logger.interface";
+import type { ILogger, LoggerOptions } from "../types/logger.interface";
 import { LogLevel, shouldLog } from "../types/level";
 import { formatMessage } from "../utils/format-message";
 import type { EventChannel } from "../types/event-channel.interface";
@@ -15,7 +15,7 @@ export interface EventLoggerOptions extends LoggerOptions {
  * A logger implementation that publishes logs to an EventChannel
  * This can be used to send logs to remote systems
  */
-export class EventLogger implements Logger {
+export class EventLogger implements ILogger {
   private readonly options: Required<Omit<EventLoggerOptions, "loggers">>;
 
   constructor(
@@ -78,7 +78,7 @@ export class EventLogger implements Logger {
       await this.eventChannel.publish(logEvent);
     } catch (error) {
       // Don't let logging errors cause application failures
-      console.error("Failed to publish log event:", error);
+      console.error(`Failed to publish log event: ${error instanceof Error ? error.message : "Unknown error"}`);
     }
   }
 
@@ -109,7 +109,7 @@ export class EventLogger implements Logger {
   /**
    * Create a child logger with a new context
    */
-  child(context: string): Logger {
+  child(context: string): ILogger {
     return new EventLogger(this.eventChannel, {
       ...this.options,
       context: `${this.options.context}:${context}`,

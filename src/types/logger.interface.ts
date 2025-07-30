@@ -3,7 +3,7 @@ import type { EventChannel } from "./event-channel.interface";
 /**
  * Core logger interface shared across Synet packages
  */
-export interface Logger {
+export interface ILogger {
   /**
    * Log a debug message
    * @param message The message to log
@@ -91,5 +91,10 @@ export interface LoggerOptions {
    * Array of loggers for MultiLogger
    * Required if using MultiLogger
    */
-  loggers?: Logger[];
+  loggers?: ILogger[];
 }
+
+/**
+ * @deprecated Use ILogger instead. This alias is kept for backward compatibility.
+ */
+export type Logger = ILogger;

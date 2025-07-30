@@ -1,4 +1,4 @@
-import type { Logger, LoggerOptions } from "../types/logger.interface";
+import type { ILogger, LoggerOptions } from "../types/logger.interface";
 import { LogLevel, shouldLog } from "../types/level";
 import { formatMessage } from "../utils/format-message";
 import {
@@ -8,7 +8,7 @@ import {
 /**
  * A console-based implementation of the Logger interface
  */
-export class ConsoleLogger implements Logger {
+export class ConsoleLogger implements ILogger {
   private readonly options: Required<
     Omit<LoggerOptions, "eventChannel" | "loggers" | "channelName">
   >;
@@ -182,7 +182,7 @@ export class ConsoleLogger implements Logger {
   /**
    * Create a child logger with a new context
    */
-  child(context: string): Logger {
+  child(context: string): ILogger {
     return new ConsoleLogger({
       ...this.options,
       context: `${this.options.context}:${context}`,

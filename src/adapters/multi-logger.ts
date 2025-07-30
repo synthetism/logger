@@ -1,15 +1,15 @@
-import type { Logger } from "../types/logger.interface";
+import type { ILogger, LoggerOptions } from "../types/logger.interface";
 import type { LogLevel } from "../types/level";
 
 /**
  * Logger implementation that sends logs to multiple targets
  */
-export class MultiLogger implements Logger {
+export class MultiLogger implements ILogger {
   /**
    * Create a new MultiLogger that sends logs to multiple targets
    * @param loggers Array of loggers to send logs to
    */
-  constructor(private loggers: Logger[]) {}
+  constructor(private loggers: ILogger[]) {}
 
   debug(message: string, ...args: unknown[]): void {
     for (const logger of this.loggers) {
@@ -40,7 +40,7 @@ export class MultiLogger implements Logger {
   /**
    * Create a child logger with a new context
    */
-  child(context: string): Logger {
+  child(context: string): ILogger {
     // Create child loggers from each source logger
     const childLoggers = this.loggers.map((logger) => logger.child(context));
     return new MultiLogger(childLoggers);
