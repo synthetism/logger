@@ -1,6 +1,6 @@
 {
   "name": "@synet/logger",
-  "version": "1.0.1-dev.1",
+  "version": "1.0.1-dev.2",
   "description": "Dependency-free, multi-adapter logging with Unit Architecture compliance",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

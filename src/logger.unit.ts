@@ -52,7 +52,7 @@ export type LoggerBackendOptions = {
   console: LoggerOptions;
   file: FileLoggerOptions;
   event: EventLoggerOptions & { eventChannel: EventChannel<LoggerEvent> };
-  multi: LoggerOptions & { loggers: ILogger[] };
+  multi: LoggerOptions & { loggers: (Logger | ILogger)[] };
   null: LoggerOptions;
 };
 
@@ -115,68 +115,67 @@ export class Logger extends Unit<LogProps> implements ILogger {
    * Log a debug message
    */
   debug(message: string, ...args: unknown[]): void {
-    // Enhanced message with Unit identity for capability-driven logging
-    if (this.can('audit.enhanced')) {
-      const enhancedMessage = `[${this.props.dna.id}] ${message}`;
-      this.props.backend.debug(enhancedMessage, ...args);
-    } else {
+   
       this.props.backend.debug(message, ...args);
-    }
+    
   }
 
   /**
    * Log an info message
    */
   info(message: string, ...args: unknown[]): void {
-    if (this.can('audit.enhanced')) {
-      const enhancedMessage = `[${this.props.dna.id}] ${message}`;
-      this.props.backend.info(enhancedMessage, ...args);
-    } else {
+
       this.props.backend.info(message, ...args);
-    }
+   
   }
 
   /**
    * Log a warning message
    */
   warn(message: string, ...args: unknown[]): void {
-    if (this.can('audit.enhanced')) {
-      const enhancedMessage = `[${this.props.dna.id}] ${message}`;
-      this.props.backend.warn(enhancedMessage, ...args);
-    } else {
+  
       this.props.backend.warn(message, ...args);
-    }
+
   }
 
   /**
    * Log an error message
    */
   error(message: string, ...args: unknown[]): void {
-    if (this.can('audit.enhanced')) {
-      const enhancedMessage = `[${this.props.dna.id}] ${message}`;
-      this.props.backend.error(enhancedMessage, ...args);
-    } else {
-      this.props.backend.error(message, ...args);
-    }
+
+    this.props.backend.error(message, ...args);
+  
   }
 
   /**
    * Log a message at the specified level
    */
   log(level: LogLevel, message: string, ...args: unknown[]): void {
-    if (this.can('audit.enhanced')) {
-      const enhancedMessage = `[${this.props.dna.id}] ${message}`;
-      this.props.backend.log(level, enhancedMessage, ...args);
-    } else {
+
       this.props.backend.log(level, message, ...args);
-    }
+    
   }
 
   /**
    * Create a child logger with a specific context
+   * Unit Architecture pattern: create new Logger Unit with updated context
    */
-  child(context: string): ILogger {
-    return this.props.backend.child(context);
+  child(context: string): Logger {
+    // Create new config with updated context
+    const currentOptions = this.props.config.options || {};
+    const newContext = currentOptions.context 
+      ? `${currentOptions.context}:${context}`
+      : context;
+    
+    const newConfig = {
+      ...this.props.config,
+      options: {
+        ...currentOptions,
+        context: newContext
+      }
+    };
+
+    return Logger.create(newConfig);
   }
 
   // ==========================================
@@ -326,7 +325,18 @@ When learned by other units:
         if (!multiOptions?.loggers) {
           throw new Error('[Log Unit] Multi logger requires loggers array in options');
         }
-        return new MultiLogger(multiOptions.loggers);
+        
+        // Handle both Logger Units and ILogger adapters
+        const backendLoggers = multiOptions.loggers.map(logger => {
+          // If it's a Logger Unit, extract the backend
+          if (logger && typeof logger === 'object' && 'getBackend' in logger) {
+            return (logger as Logger).getBackend();
+          }
+          // Otherwise assume it's already an ILogger
+          return logger as ILogger;
+        });
+        
+        return new MultiLogger(backendLoggers);
       }
 
       case "null":

@@ -4,10 +4,11 @@ import {
   MultiLogger,
   NullLogger,
 } from "./adapters";
-import type { Logger, LoggerOptions } from "./types/logger.interface";
+import type { LoggerOptions } from "./types/logger.interface";
 import type { EventChannel } from "./types/event-channel.interface";
 import type { EventLoggerOptions } from "./adapters/event-logger";
 import { LogLevel } from "./types/level";
+import { Logger } from "./logger.unit";
 import type { LoggerEvent } from "./types/logger-events";
 /**
  * Available logger types
@@ -35,17 +36,20 @@ export function createLogger(
 ): Logger {
   switch (type) {
     case LoggerType.CONSOLE:
-      return new ConsoleLogger(options);
+      return Logger.create({ type: LoggerType.CONSOLE, options });
     case LoggerType.NULL:
-      return new NullLogger();
+      return  Logger.create({ type: LoggerType.NULL, options });
     case LoggerType.MULTI:
+
       if (!options.loggers || !Array.isArray(options.loggers)) {
         throw new Error("Loggers array is required for MultiLogger");
       }
-      return new MultiLogger(options.loggers as Logger[]);
+      return Logger.create({ type: LoggerType.MULTI, options: {
+          loggers : options.loggers
+      } });
     default:
       console.warn(`Unknown logger type: ${type}, using ConsoleLogger`);
-      return new ConsoleLogger(options);
+      return Logger.create({ type: LoggerType.CONSOLE, options });
   }
 }
 
@@ -56,25 +60,32 @@ export function createEventLogger<T>(
   eventChannel: EventChannel<LoggerEvent>,
   options: EventLoggerOptions = {},
 ): Logger {
-  return new EventLogger(eventChannel, options);
+  return Logger.create({ type: LoggerType.EVENT, options: {
+      eventChannel,
+      ...options
+  } });
 }
 
 /**
  * Creates a MultiLogger that sends logs to multiple destinations
  */
 export function createMultiLogger(loggers: Logger[]): Logger {
-  return new MultiLogger(loggers);
+  return Logger.create({ type: LoggerType.MULTI, options: {
+      loggers
+  } });
 }
 
 /**
  * Singleton instances for reuse
  */
 const loggerInstances = {
-  root: createLogger(LoggerType.CONSOLE, {
-    level: (process.env.LOG_LEVEL as LogLevel) || LogLevel.INFO,
-    context: "Synet",
-  }),
-  null: new NullLogger(),
+  root: Logger.create({
+    type: LoggerType.CONSOLE, options: {
+      level: (process.env.LOG_LEVEL as LogLevel) || LogLevel.INFO,
+      context: "Logger",
+    }
+  }) as Logger,
+  null: Logger.create({ type: LoggerType.NULL }) as Logger,
 };
 
 /**
@@ -104,8 +115,8 @@ export function getLogger(context: string, type?: LoggerType): Logger {
  * @param context Optional context for the null logger
  * @returns A null logger that discards all messages
  */
-export function getNullLogger(context?: string): Logger {
-  return context ? loggerInstances.null.child(context) : loggerInstances.null;
+export function getNullLogger(): Logger {
+  return loggerInstances.null;
 }
 
 /**

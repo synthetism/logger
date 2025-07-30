@@ -21,7 +21,7 @@ export class ConsoleLogger implements ILogger {
     // Set default options
     this.options = {
       level: options.level || LogLevel.INFO,
-      context: options.context || "Synet",
+      context: options.context || "Default",
       timestamp: options.timestamp !== undefined ? options.timestamp : true,
       formatting: {
         colorize:
