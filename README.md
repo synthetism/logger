@@ -59,7 +59,7 @@ childLogger.info('Connection established'); // [INFO] [MyApp:Database] Connectio
 - **Immutable evolution** - operations create new units
 - **Identity preservation** across transformations
 
-### **Unit Architecture **
+### **Unit Architecture**
 - **Teaches capabilities** to other units via `teach()` contracts
 - **Learns capabilities** from other units without leakage
 - **Self-aware** with DNA identity and living documentation
