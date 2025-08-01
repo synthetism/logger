@@ -40,7 +40,7 @@ consoleLogger.warn('Warning: This is just a demo');
 // Test child logger creation (returns ILogger, not Logger Unit)
 console.log('\n👶 Child logger test:');
 const childLogger = consoleLogger.child('ChildContext');
-console.log(`Child Logger created successfully`);
+console.log('Child Logger created successfully');
 childLogger.info('Message from child logger');
 
 // Test immutable evolution
