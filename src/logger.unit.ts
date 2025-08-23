@@ -158,6 +158,7 @@ export class Logger extends Unit<LogProps> implements ILogger {
       dna: createUnitSchema({
         id: "log",
         version: "1.1.1",
+        description: "Log Unit - Multi-Adapter Logging"
       }),
       backend,
       config,
