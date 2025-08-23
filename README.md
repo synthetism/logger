@@ -10,10 +10,8 @@
                __/ | __/ |                               
               |___/ |___/                                
                                                          
-version: 1.1.0
+version: 1.1.1
 ```
-
-**Conscious logging with Unit Architecture - Teaching, learning, and evolving**
 
 Multi-backend logging with Unit Architecture consciousness. Units that teach capabilities to other units, learn from specialized loggers, and evolve while maintaining identity.
 
@@ -49,7 +47,7 @@ childLogger.info('Connection established'); // [INFO] [MyApp:Database] Connectio
 ### **Multi-Backend Logging**
 - **Console logger** with colors and formatting
 - **File logger** with rotation and async writes
-- **Event logger** for structured log streaming
+- **Event logger** for structured realtime log streaming
 - **Multi logger** for broadcasting to multiple backends
 - **Null logger** for silent operation
 

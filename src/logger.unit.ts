@@ -18,8 +18,16 @@ import {
   type TeachingContract,
   Unit,
   type UnitProps,
-  UnitSchema,
+  type UnitCore,
+  type Capabilities,
+  type Schema,
+  type Validator,
   createUnitSchema,
+} from "@synet/unit";
+import { 
+  Capabilities as CapabilitiesClass, 
+  Schema as SchemaClass, 
+  Validator as ValidatorClass 
 } from "@synet/unit";
 import type { ILogger, LoggerOptions } from "./types/logger.interface";
 import type { LogLevel } from "./types/level";
@@ -86,6 +94,58 @@ export class Logger extends Unit<LogProps> implements ILogger {
     super(props);
   }
 
+  // =============================================================================
+  // CONSCIOUSNESS TRINITY - v1.1.1
+  // =============================================================================
+
+  /**
+   * Build consciousness trinity - creates living instances once
+   */
+  protected build(): UnitCore {
+    const capabilities = CapabilitiesClass.create(this.dna.id, {
+      debug: (...args: unknown[]) => this.debug(args[0] as string, ...args.slice(1)),
+      info: (...args: unknown[]) => this.info(args[0] as string, ...args.slice(1)),
+      warn: (...args: unknown[]) => this.warn(args[0] as string, ...args.slice(1)),
+      error: (...args: unknown[]) => this.error(args[0] as string, ...args.slice(1)),
+      log: (...args: unknown[]) => this.log(args[0] as LogLevel, args[1] as string, ...args.slice(2)),
+      child: (...args: unknown[]) => this.child(args[0] as string),
+      getBackendInfo: (...args: unknown[]) => this.getBackendInfo(),
+    });
+
+    // Empty schemas - Logger is an orchestrator unit, not a tool unit
+    const schema = SchemaClass.create(this.dna.id, {});
+
+    const validator = ValidatorClass.create({
+      unitId: this.dna.id,
+      capabilities,
+      schema,
+      strictMode: false
+    });
+
+    return { capabilities, schema, validator };
+  }
+
+  /**
+   * Get capabilities consciousness - returns living instance
+   */
+  capabilities(): Capabilities {
+    return this._unit.capabilities;
+  }
+
+  /**
+   * Get schema consciousness - returns living instance  
+   */
+  schema(): Schema {
+    return this._unit.schema;
+  }
+
+  /**
+   * Get validator consciousness - returns living instance
+   */
+  validator(): Validator {
+    return this._unit.validator;
+  }
+
   /**
    * CREATE - Create a new Logger Unit
    */
@@ -97,7 +157,7 @@ export class Logger extends Unit<LogProps> implements ILogger {
     const props: LogProps = {
       dna: createUnitSchema({
         id: "log",
-        version: "1.0.0",
+        version: "1.1.1",
       }),
       backend,
       config,
@@ -187,26 +247,15 @@ export class Logger extends Unit<LogProps> implements ILogger {
    */
   teach(): TeachingContract {
     return {
-      unitId: this.props.dna.id,
-      capabilities: {
-        // Native logging capabilities
-        debug: (...args: unknown[]) => this.debug(args[0] as string, ...args.slice(1)),
-        info: (...args: unknown[]) => this.info(args[0] as string, ...args.slice(1)),
-        warn: (...args: unknown[]) => this.warn(args[0] as string, ...args.slice(1)),
-        error: (...args: unknown[]) => this.error(args[0] as string, ...args.slice(1)),
-        log: (...args: unknown[]) => this.log(args[0] as LogLevel, args[1] as string, ...args.slice(2)),
-        child: (...args: unknown[]) => this.child(args[0] as string),    
-        getBackendInfo: () => this.getBackendInfo.bind(this),
-      },
+      unitId: this.dna.id,
+      capabilities: this._unit.capabilities,
+      schema: this._unit.schema,
+      validator: this._unit.validator
     };
   }
 
   whoami(): string {
     return `Log[${this.props.dna.id}:${this.props.config.type}]`;
-  }
-
-  capabilities(): string[] {
-    return Array.from(this._capabilities.keys());
   }
 
   help(): void {

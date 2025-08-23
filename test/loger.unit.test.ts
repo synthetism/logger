@@ -55,9 +55,13 @@ describe('Log Unit - Unit Architecture', () => {
       const contract = log.teach();
       
       expect(contract.unitId).toBe('log');
-      expect(contract.capabilities).toHaveProperty('debug');
-      expect(contract.capabilities).toHaveProperty('info');
-
+      expect(contract.capabilities.has('debug')).toBe(true);
+      expect(contract.capabilities.has('info')).toBe(true);
+      expect(contract.capabilities.has('warn')).toBe(true);
+      expect(contract.capabilities.has('error')).toBe(true);
+      expect(contract.capabilities.has('log')).toBe(true);
+      expect(contract.capabilities.has('child')).toBe(true);
+      expect(contract.capabilities.has('getBackendInfo')).toBe(true);
     });
 
     it('should provide backend information', () => {
